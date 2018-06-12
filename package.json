@@ -1,5 +1,5 @@
 {
-  "name": "bulma-test__using-scaffold",
+  "name": "basic-scaffold",
   "version": "0.0.1",
   "description": "test",
   "main": "gulpfile.js",
@@ -68,7 +68,6 @@
     "download": [],
     "distCss": [
       "./node_modules/normalize.css/normalize.css",
-      "./src/vendor/bulma.css",
       "./node_modules/flexboxgrid/dist/flexboxgridNOTUSING.min.css",
       "./src/css/prism-theme.css",
       "./build/css/*.css",
