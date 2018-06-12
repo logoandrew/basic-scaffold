@@ -1,0 +1,148 @@
+{
+  "name": "bulma-test__using-scaffold",
+  "version": "0.0.1",
+  "description": "test",
+  "main": "gulpfile.js",
+  "author": "Andrew Newhouse",
+  "copyright": "Andrew Newhouse",
+  "license": "UNLICENSED",
+  "private": true,
+  "paths": {
+    "src": {
+      "base": "./src/",
+      "css": "./src/css/",
+      "json": "./src/json/",
+      "js": "./src/js/",
+      "pug": "./src/pug/",
+      "img": "./src/img/",
+      "sass": "./src/sass/"
+    },
+    "dist": {
+      "base": "./public/",
+      "css": "./public/css/",
+      "js": "./public/js/",
+      "img": "./public/img/"
+    },
+    "build": {
+      "base": "./build/",
+      "css": "./build/css/",
+      "js": "./build/js/",
+      "img": "./build/img/"
+    },
+    "sass": ""
+  },
+  "vars": {
+    "name": {
+      "siteCss": "site.combined.min.css",
+      "sass": "style.sass",
+      "css": "style.css"
+    }
+  },
+  "opt": {
+    "sourcemaps": {
+      "loadmaps": true
+    },
+    "size": {
+      "gzipped": false,
+      "showfiles": true
+    },
+    "cssnano": {
+      "discardComments_removeAll": true,
+      "discardDuplicates": true,
+      "minifyFontValues": true,
+      "minifySelectors": true
+    },
+    "pug": {
+      "pretty": true
+    },
+    "imagemin": {
+      "progressive": true,
+      "interlaced": true,
+      "optimizationLevel": 7,
+      "svgoPlugins_removeVB": false,
+      "svgoPlugins_cleanupIDs": false,
+      "verbose": true
+    }
+  },
+  "globs": {
+    "download": [],
+    "distCss": [
+      "./node_modules/normalize.css/normalize.css",
+      "./src/vendor/bulma.css",
+      "./node_modules/flexboxgrid/dist/flexboxgridNOTUSING.min.css",
+      "./src/css/prism-theme.css",
+      "./build/css/*.css",
+      "./src/css/*.css"
+    ],
+    "img": [
+      "./public/img/"
+    ],
+    "distJs": [
+      "./build/js/*.js",
+      "./node_modules/lazysizes/lazysizes.min.js",
+      "./node_modules/lazysizes/plugins/bgset/ls.bgset.min.js",
+      "./node_modules/picturefill/dist/picturefill.min.js"
+    ],
+    "prismJs": [
+      "./node_modules/prismjs/prism.js",
+      "./node_modules/prismjs/components/prism-markup.js",
+      "./node_modules/prismjs/components/prism-apacheconf.js",
+      "./node_modules/prismjs/components/prism-css.js",
+      "./node_modules/prismjs/components/prism-json.js",
+      "./node_modules/prismjs/components/prism-twig.js",
+      "./node_modules/prismjs/components/prism-php.js",
+      "./node_modules/prismjs/components/prism-bash.js",
+      "./node_modules/prismjs/components/prism-javascript.js",
+      "./node_modules/prismjs/plugins/line-numbers/prism-line-numbers.min.js"
+    ],
+    "inlineJs": [
+      "./node_modules/loadjs/dist/loadjs.min.js",
+      "./node_modules/tiny-cookie/tiny-cookie.min.js"
+    ]
+  },
+  "devDependencies": {
+    "chalk": "^2.3.0",
+    "fancy-log": "^1.3.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-cached": "^1.1.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-debug": "^4.0.0",
+    "gulp-download": "0.0.1",
+    "gulp-filter": "^5.0.1",
+    "gulp-header": "^2.0.5",
+    "gulp-if": "^2.0.2",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-newer": "^1.3.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-print": "^5.0.0",
+    "gulp-pug": "^4.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^1.0.0",
+    "gulp-rev": "^8.1.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-size": "^3.0.0",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-streamify": "^1.0.2",
+    "moment": "^2.19.1",
+    "pa11y": "^5.0.4",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "flexboxgrid": "^6.3.1",
+    "lazysizes": "^4.0.1",
+    "loadjs": "^3.5.1",
+    "normalize.css": "^8.0.0",
+    "npm": "^6.1.0",
+    "picturefill": "^3.0.2",
+    "prismjs": "^1.8.4",
+    "tiny-cookie": "^2.0.2"
+  },
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build"
+  }
+}
