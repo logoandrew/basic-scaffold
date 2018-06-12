@@ -4,7 +4,7 @@
   "description": "Basic structure for building a simple website (using Gulp to process Sass, Pug, JS, images, etc.)",
   "main": "gulpfile.js",
   "author": "Andrew Newhouse",
-  "copyright": "Andrew Newhouse",
+  "copyright": "",
   "license": "UNLICENSED",
   "private": true,
   "paths": {
