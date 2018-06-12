@@ -1,7 +1,7 @@
 {
   "name": "basic-scaffold",
   "version": "0.0.1",
-  "description": "test",
+  "description": "Basic structure for building a simple website (using Gulp to process Sass, Pug, JS, images, etc.)",
   "main": "gulpfile.js",
   "author": "Andrew Newhouse",
   "copyright": "Andrew Newhouse",
