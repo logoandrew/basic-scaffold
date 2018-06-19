@@ -26,28 +26,29 @@ const banner = [
 ].join("\n");
 
 
-// sass - build the sass to the build folder, including the required paths, and writing out a sourcemap
+// sass - build the sass to the temp folder, including the required paths, and writing out a sourcemap
 gulp.task("sass", () => {
     $.fancyLog($.chalk.yellow("-> Compiling sass"));
     return gulp.src(pkg.paths.src.sass + pkg.vars.name.sass)
+        .pipe($.debug({title: 'sass:'}))
         .pipe($.plumber({errorHandler: onError}))
-        .pipe($.print.default())
         .pipe($.sourcemaps.init({loadMaps: pkg.opt.sourcemaps.loadmaps}))
+        .pipe($.cached("sass_compile"))
         .pipe($.sass({
                 includePaths: pkg.paths.sass
             })
             .on("error", $.sass.logError))
-        .pipe($.cached("sass_compile"))
         .pipe($.autoprefixer())
         .pipe($.sourcemaps.write("./"))
         .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
-        .pipe(gulp.dest(pkg.paths.build.css));
+        .pipe(gulp.dest(pkg.paths.temp.css));
 });
 
-// css task - combine & minimize any distribution CSS into the public css folder, and add our banner to it
+// css task - combine & minimize any distribution CSS into the dist css folder, and add our banner to it
 gulp.task("css", ["sass"], () => {
     $.fancyLog($.chalk.yellow("-> Building css"));
     return gulp.src(pkg.globs.distCss)
+        .pipe($.debug({title: 'css:'}))
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.newer({dest: pkg.paths.dist.css + pkg.vars.name.siteCss}))
         .pipe($.print.default())
@@ -71,28 +72,18 @@ gulp.task("css", ["sass"], () => {
 gulp.task("pug", () => {
   $.fancyLog($.chalk.yellow("-> Building html"));
   return gulp.src(pkg.paths.src.pug + "**/*.pug")
-    .pipe($.print.default())
+    .pipe($.debug({title: 'pug:'}))
     .pipe($.pug({pretty: pkg.opt.pug.pretty}))
     .pipe(gulp.dest(pkg.paths.dist.base))
     .pipe($.filter("**/*.html"))
     .pipe($.livereload());
 });
 
-// Prism js task - combine the prismjs Javascript & config file into one bundle
-gulp.task("prism-js", () => {
-    $.fancyLog($.chalk.yellow("-> Building prism.min.js..."));
-    return gulp.src(pkg.globs.prismJs)
-        .pipe($.plumber({errorHandler: onError}))
-        .pipe($.newer({dest: pkg.paths.build.js + "prism.min.js"}))
-        .pipe($.concat("prism.min.js"))
-        .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
-        .pipe(gulp.dest(pkg.paths.build.js));
-});
-
 // inline js task - minimize the inline Javascript into _inlinejs in the templates path
 gulp.task("js-inline", () => {
     $.fancyLog($.chalk.yellow("-> Copying inline js"));
     return gulp.src(pkg.globs.inlineJs)
+        .pipe($.debug({title: 'jsinline:'}))
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.if(["*.js", "!*.min.js"],
             $.newer({dest: pkg.paths.templates + "_inlinejs", ext: ".min.js"}),
@@ -107,10 +98,11 @@ gulp.task("js-inline", () => {
         .pipe($.livereload());
 });
 
-// js task - minimize any distribution Javascript into the public js folder, and add our banner to it
-gulp.task("js", ["js-inline", "prism-js"], () => {
+// js task - minimize any distribution Javascript into the dist js folder, and add our banner to it
+gulp.task("js", ["js-inline"], () => {
     $.fancyLog($.chalk.yellow("-> Building js"));
     return gulp.src(pkg.globs.distJs)
+        .pipe($.debug({title: 'js:'}))
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.if(["*.js", "!*.min.js"],
             $.newer({dest: pkg.paths.dist.js, ext: ".min.js"}),
@@ -119,7 +111,6 @@ gulp.task("js", ["js-inline", "prism-js"], () => {
         .pipe($.if(["*.js", "!*.min.js"],
             $.rename({suffix: ".min"})
         ))
-        .pipe($.print.default())
         .pipe($.header(banner, {pkg: pkg}))
         .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
         .pipe(gulp.dest(pkg.paths.dist.js))

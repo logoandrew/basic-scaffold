@@ -1,6 +1,6 @@
 {
   "name": "basic-scaffold",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Basic structure for building a simple website (using Gulp to process Sass, Pug, JS, images, etc.)",
   "main": "gulpfile.js",
   "author": "Andrew Newhouse",
@@ -18,18 +18,17 @@
       "sass": "./src/sass/"
     },
     "dist": {
-      "base": "./public/",
-      "css": "./public/css/",
-      "js": "./public/js/",
-      "img": "./public/img/"
+      "base": "./dist/",
+      "css": "./dist/css/",
+      "js": "./dist/js/",
+      "img": "./dist/img/"
     },
-    "build": {
-      "base": "./build/",
-      "css": "./build/css/",
-      "js": "./build/js/",
-      "img": "./build/img/"
-    },
-    "sass": ""
+    "temp": {
+      "base": "./temp/",
+      "css": "./temp/css/",
+      "js": "./temp/js/",
+      "img": "./temp/img/"
+    }
   },
   "vars": {
     "name": {
@@ -68,31 +67,15 @@
     "download": [],
     "distCss": [
       "./node_modules/normalize.css/normalize.css",
-      "./node_modules/flexboxgrid/dist/flexboxgridNOTUSING.min.css",
-      "./src/css/prism-theme.css",
-      "./build/css/*.css",
-      "./src/css/*.css"
-    ],
-    "img": [
-      "./public/img/"
+      "./node_modules/flexboxgrid/dist/flexboxgrid.min.css",
+      "./src/css/*.css",
+      "./temp/css/*.css"
     ],
     "distJs": [
-      "./build/js/*.js",
       "./node_modules/lazysizes/lazysizes.min.js",
       "./node_modules/lazysizes/plugins/bgset/ls.bgset.min.js",
-      "./node_modules/picturefill/dist/picturefill.min.js"
-    ],
-    "prismJs": [
-      "./node_modules/prismjs/prism.js",
-      "./node_modules/prismjs/components/prism-markup.js",
-      "./node_modules/prismjs/components/prism-apacheconf.js",
-      "./node_modules/prismjs/components/prism-css.js",
-      "./node_modules/prismjs/components/prism-json.js",
-      "./node_modules/prismjs/components/prism-twig.js",
-      "./node_modules/prismjs/components/prism-php.js",
-      "./node_modules/prismjs/components/prism-bash.js",
-      "./node_modules/prismjs/components/prism-javascript.js",
-      "./node_modules/prismjs/plugins/line-numbers/prism-line-numbers.min.js"
+      "./node_modules/picturefill/dist/picturefill.min.js",
+      "./src/js/*.js",
     ],
     "inlineJs": [
       "./node_modules/loadjs/dist/loadjs.min.js",
@@ -120,15 +103,11 @@
     "gulp-print": "^5.0.0",
     "gulp-pug": "^4.0.1",
     "gulp-rename": "^1.2.2",
-    "gulp-replace": "^1.0.0",
-    "gulp-rev": "^8.1.0",
     "gulp-sass": "^4.0.1",
     "gulp-size": "^3.0.0",
     "gulp-sourcemaps": "^2.6.1",
-    "gulp-streamify": "^1.0.2",
     "moment": "^2.19.1",
-    "pa11y": "^5.0.4",
-    "vinyl-source-stream": "^2.0.0"
+    "pa11y": "^5.0.4"
   },
   "dependencies": {
     "flexboxgrid": "^6.3.1",
@@ -137,7 +116,6 @@
     "normalize.css": "^8.0.0",
     "npm": "^6.1.0",
     "picturefill": "^3.0.2",
-    "prismjs": "^1.8.4",
     "tiny-cookie": "^2.0.2"
   },
   "scripts": {
