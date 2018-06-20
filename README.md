@@ -13,9 +13,9 @@
     |   |-- css
     |   |-- img
     |   |-- js
-    |   |-- json
     |   |-- pug
-    |   `-- sass
+    |   |-- sass
+    |   `-- vendor
     |
     |-- temp
     |   |-- css
