@@ -2,10 +2,12 @@
   "name": "basic-scaffold",
   "version": "0.0.2",
   "description": "Basic structure for building a simple website (using Gulp to process Sass, Pug, JS, images, etc.)",
+  "homepage": "https://github.com/logoandrew/basic-scaffold",
+  "bugs": "https://github.com/logoandrew/basic-scaffold/issues",
   "main": "gulpfile.js",
   "author": "Andrew Newhouse",
-  "copyright": "",
-  "license": "UNLICENSED",
+  "copyright": "2018 Andrew Newhouse",
+  "license": "MIT",
   "private": true,
   "paths": {
     "src": {
