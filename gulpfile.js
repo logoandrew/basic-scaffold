@@ -3,6 +3,7 @@ const pkg = require("./package.json");
 
 // gulp
 const gulp = require("gulp");
+const browserSync = require('browser-sync').create();
 
 // load all plugins in "devDependencies" into the variable $
 const $ = require("gulp-load-plugins")({
@@ -34,7 +35,7 @@ gulp.task("sass", () => {
     // get main sass file from src folder
     return gulp.src(pkg.paths.src.sass + pkg.vars.name.sass)
         // handle errors
-        .pipe($.plumber({errorHandler: onError}))
+        .pipe($.plumber({ errorHandler: onError }))
         // convert sass to css
         .pipe($.sass({
                 includePaths: pkg.paths.src.sass,
@@ -59,7 +60,7 @@ gulp.task("css", ["sass"], () => {
     // get css files from globs and/including temp folder
     return gulp.src(pkg.globs.css)
         // handle errors
-        .pipe($.plumber({errorHandler: onError}))
+        .pipe($.plumber({ errorHandler: onError }))
         // display filenames
         .pipe($.print.default())
         // combine css files
@@ -68,13 +69,13 @@ gulp.task("css", ["sass"], () => {
         .pipe($.autoprefixer())
         // minify if not in development
         .pipe($.if(!pkg.devMode, $.cssnano({
-                discardComments: {removeAll: pkg.opt.cssnano.discardComments_removeAll},
+                discardComments: { removeAll: pkg.opt.cssnano.discardComments_removeAll },
                 discardDuplicates: pkg.opt.cssnano.discardDuplicates,
                 minifyFontValues: pkg.opt.cssnano.minifyFontValues,
                 minifySelectors: pkg.opt.cssnano.minifySelectors
             })))
         // add banner
-        .pipe($.header(banner, {pkg: pkg}))
+        .pipe($.header(banner, { pkg: pkg }))
         // display file/size
         .pipe($.size({
                 gzip: pkg.opt.size.gzipped,
@@ -82,8 +83,8 @@ gulp.task("css", ["sass"], () => {
             }))
         // put updated css file in dist folder
         .pipe(gulp.dest(pkg.paths.dist.css))
-        // livereload
-        .pipe($.livereload());
+        // reload browsers
+        .pipe(browserSync.stream());
 });
 
 
@@ -98,13 +99,13 @@ gulp.task("pug", () => {
                 return require('./package.json');
             }))
         // convert pug to html files
-        .pipe($.pug({pretty: pkg.opt.pug.pretty}))
+        .pipe($.pug({ pretty: pkg.opt.pug.pretty }))
         // put generated html files into dist folder
         .pipe(gulp.dest(pkg.paths.dist.base))
         // if any html files change then... ?-necessary?
-        //.pipe($.filter("**/*.html"))
-        // livereload
-        .pipe($.livereload());
+        .pipe($.filter("**/*.html"))
+        // reload browsers
+        .pipe(browserSync.stream());
 });
 
 
@@ -112,19 +113,20 @@ gulp.task("pug", () => {
 gulp.task("js-inline", () => {
     $.fancyLog($.chalk.yellow("-> Copying inline js"));
     return gulp.src(pkg.globs.inlineJs)
-        .pipe($.debug({title: '! jsinline:'}))
-        .pipe($.plumber({errorHandler: onError}))
+        .pipe($.debug({ title: '! jsinline:' }))
+        .pipe($.plumber({ errorHandler: onError }))
         .pipe($.if(["*.js", "!*.min.js"],
-            $.newer({dest: pkg.paths.templates + "_inlinejs", ext: ".min.js"}),
-            $.newer({dest: pkg.paths.templates + "_inlinejs"})
+            $.newer({ dest: pkg.paths.templates + "_inlinejs", ext: ".min.js" }),
+            $.newer({ dest: pkg.paths.templates + "_inlinejs" })
         ))
         .pipe($.if(["*.js", "!*.min.js"],
-            $.rename({suffix: ".min"})
+            $.rename({ suffix: ".min" })
         ))
-        .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
+        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
         .pipe(gulp.dest(pkg.paths.templates + "_inlinejs"))
         .pipe($.filter("**/*.js"))
-        .pipe($.livereload());
+        // reload browsers
+        .pipe(browserSync.stream());
 });
 
 
@@ -132,20 +134,21 @@ gulp.task("js-inline", () => {
 gulp.task("js", ["js-inline"], () => {
     $.fancyLog($.chalk.yellow("-> Building js"));
     return gulp.src(pkg.globs.js)
-        .pipe($.debug({title: '! js:'}))
-        .pipe($.plumber({errorHandler: onError}))
+        .pipe($.debug({ title: '! js:' }))
+        .pipe($.plumber({ errorHandler: onError }))
         .pipe($.if(["*.js", "!*.min.js"],
-            $.newer({dest: pkg.paths.dist.js, ext: ".min.js"}),
-            $.newer({dest: pkg.paths.dist.js})
+            $.newer({ dest: pkg.paths.dist.js, ext: ".min.js" }),
+            $.newer({ dest: pkg.paths.dist.js })
         ))
         .pipe($.if(["*.js", "!*.min.js"],
-            $.rename({suffix: ".min"})
+            $.rename({ suffix: ".min" })
         ))
-        .pipe($.header(banner, {pkg: pkg}))
-        .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
+        .pipe($.header(banner, { pkg: pkg }))
+        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
         .pipe(gulp.dest(pkg.paths.dist.js))
         .pipe($.filter("**/*.js"))
-        .pipe($.livereload());
+        // reload browsers
+        .pipe(browserSync.stream());
 });
 
 
@@ -224,13 +227,13 @@ gulp.task("a11y", (callback) => {
 gulp.task("imagemin", () => {
     return gulp.src(pkg.paths.src.img + "**/*.{png,jpg,jpeg,gif,svg}")
         .pipe($.imagemin([
-          	$.imagemin.gifsicle({interlaced: pkg.opt.imagemin.interlaced}),
-          	$.imagemin.jpegtran({progressive: pkg.opt.imagemin.progressive}),
-          	$.imagemin.optipng({optimizationLevel: pkg.opt.imagemin.optimizationLevel}),
+          	$.imagemin.gifsicle({ interlaced: pkg.opt.imagemin.interlaced }),
+          	$.imagemin.jpegtran({ progressive: pkg.opt.imagemin.progressive }),
+          	$.imagemin.optipng({ optimizationLevel: pkg.opt.imagemin.optimizationLevel }),
           	$.imagemin.svgo({
           		plugins: [
-          			{removeViewBox: pkg.opt.imagemin.svgoPlugins_removeVB},
-          			{cleanupIDs: pkg.opt.imagemin.svgoPlugins_cleanupIDs}
+          			{ removeViewBox: pkg.opt.imagemin.svgoPlugins_removeVB },
+          			{ cleanupIDs: pkg.opt.imagemin.svgoPlugins_cleanupIDs }
           		]
           	})
           ]))
@@ -240,16 +243,15 @@ gulp.task("imagemin", () => {
 
 // Default task
 gulp.task("default", ["css", "js", "pug"], () => {
-    $.livereload.listen();
+    browserSync.init({
+        server: "./dist"
+    });
     gulp.watch([pkg.paths.src.sass + "**/*.sass"], ["css"]);
     gulp.watch([pkg.paths.src.css + "**/*.css"], ["css"]);
     gulp.watch([pkg.paths.src.js + "**/*.js"], ["js"]);
     gulp.watch([pkg.paths.src.pug + "**/*.pug"], ["pug"]);
-    gulp.watch([pkg.paths.dist.base + "**/*.{html,htm}"], () => {
-        gulp.src(pkg.paths.dist.base + "**/*.{html,htm}")
-            .pipe($.plumber({errorHandler: onError}))
-            .pipe($.livereload());
-    });
+    gulp.watch([pkg.paths.dist.base + "**/*.{html,htm}"])
+        .on('change', browserSync.reload);
 });
 
 
