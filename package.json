@@ -1,6 +1,6 @@
 {
   "name": "basic-scaffold",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Basic structure for building a simple website (using Gulp to process Sass, Pug, JS, images, etc.)",
   "homepage": "https://github.com/logoandrew/basic-scaffold",
   "bugs": "https://github.com/logoandrew/basic-scaffold/issues",
@@ -9,11 +9,11 @@
   "copyright": "Andrew Newhouse",
   "license": "MIT",
   "private": true,
+  "devMode": true,
   "paths": {
     "src": {
       "base": "./src/",
       "css": "./src/css/",
-      "json": "./src/json/",
       "js": "./src/js/",
       "pug": "./src/pug/",
       "img": "./src/img/",
@@ -34,7 +34,8 @@
   },
   "vars": {
     "name": {
-      "siteCss": "site.combined.min.css",
+      "siteCss": "site-style.combined.css",
+      "siteJs": "site-scripts.combined.js",
       "sass": "style.sass",
       "css": "style.css"
     }
@@ -42,6 +43,9 @@
   "opt": {
     "sourcemaps": {
       "loadmaps": true
+    },
+    "sass": {
+      "output": "expanded"
     },
     "size": {
       "gzipped": false,
@@ -65,15 +69,18 @@
       "verbose": true
     }
   },
+  "browserslist": [
+    "> 0.2% in US"
+  ],
   "globs": {
     "download": [],
-    "distCss": [
+    "css": [
       "./node_modules/normalize.css/normalize.css",
-      "./node_modules/flexboxgrid/dist/flexboxgrid.min.css",
+      "./node_modules/flexboxgrid/dist/flexboxgrid.css",
       "./src/css/*.css",
       "./temp/css/*.css"
     ],
-    "distJs": [
+    "js": [
       "./node_modules/lazysizes/lazysizes.min.js",
       "./node_modules/lazysizes/plugins/bgset/ls.bgset.min.js",
       "./node_modules/picturefill/dist/picturefill.min.js",

@@ -14,6 +14,7 @@ const onError = (err) => {
     console.log(err);
 };
 
+
 const banner = [
     "/**",
     " * @project        <%= pkg.name %>",
@@ -26,64 +27,88 @@ const banner = [
 ].join("\n");
 
 
-// sass - build the sass to the temp folder, including the required paths, and writing out a sourcemap
+// SRC SASS -> TEMP CSS
 gulp.task("sass", () => {
+    // state that we are starting the sass task
     $.fancyLog($.chalk.yellow("-> Compiling sass"));
+    // get main sass file from src folder
     return gulp.src(pkg.paths.src.sass + pkg.vars.name.sass)
-        .pipe($.debug({title: 'sass:'}))
+        // handle errors
         .pipe($.plumber({errorHandler: onError}))
-        .pipe($.sourcemaps.init({loadMaps: pkg.opt.sourcemaps.loadmaps}))
-        .pipe($.cached("sass_compile"))
+        // convert sass to css
         .pipe($.sass({
-                includePaths: pkg.paths.sass
+                includePaths: pkg.paths.src.sass,
+                outputStyle: pkg.opt.sass.output
             })
             .on("error", $.sass.logError))
-        .pipe($.autoprefixer())
-        .pipe($.sourcemaps.write("./"))
-        .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
+        // display file/size
+        .pipe($.size({
+                gzip: pkg.opt.size.gzipped,
+                showFiles: pkg.opt.size.showfiles
+            }))
+        // put generated css file in temp folder
         .pipe(gulp.dest(pkg.paths.temp.css));
 });
 
-// css task - combine & minimize any distribution CSS into the dist css folder, and add our banner to it
+
+// TEMP CSS -> DIST CSS
 gulp.task("css", ["sass"], () => {
+    // run sass task
+    // state that we are starting the css task
     $.fancyLog($.chalk.yellow("-> Building css"));
-    return gulp.src(pkg.globs.distCss)
-        .pipe($.debug({title: 'css:'}))
+    // get css files from globs and/including temp folder
+    return gulp.src(pkg.globs.css)
+        // handle errors
         .pipe($.plumber({errorHandler: onError}))
-        .pipe($.newer({dest: pkg.paths.dist.css + pkg.vars.name.siteCss}))
+        // display filenames
         .pipe($.print.default())
-        .pipe($.sourcemaps.init({loadMaps: pkg.opt.sourcemaps.loadmaps}))
+        // combine css files
         .pipe($.concat(pkg.vars.name.siteCss))
-        .pipe($.cssnano({
-            discardComments: {removeAll: pkg.opt.cssnano.discardComments_removeAll},
-            discardDuplicates: pkg.opt.cssnano.discardDuplicates,
-            minifyFontValues: pkg.opt.cssnano.minifyFontValues,
-            minifySelectors: pkg.opt.cssnano.minifySelectors
-          }))
+        // autoprefix
+        .pipe($.autoprefixer())
+        // minify if not in development
+        .pipe($.if(!pkg.devMode, $.cssnano({
+                discardComments: {removeAll: pkg.opt.cssnano.discardComments_removeAll},
+                discardDuplicates: pkg.opt.cssnano.discardDuplicates,
+                minifyFontValues: pkg.opt.cssnano.minifyFontValues,
+                minifySelectors: pkg.opt.cssnano.minifySelectors
+            })))
+        // add banner
         .pipe($.header(banner, {pkg: pkg}))
-        .pipe($.sourcemaps.write("./"))
-        .pipe($.size({gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles}))
+        // display file/size
+        .pipe($.size({
+                gzip: pkg.opt.size.gzipped,
+                showFiles: pkg.opt.size.showfiles
+            }))
+        // put updated css file in dist folder
         .pipe(gulp.dest(pkg.paths.dist.css))
-        .pipe($.filter("**/*.css"))
+        // livereload
         .pipe($.livereload());
 });
 
 
+// PUG -> HTML
 gulp.task("pug", () => {
-  $.fancyLog($.chalk.yellow("-> Building html"));
-  return gulp.src(pkg.paths.src.pug + "**/*.pug")
-    .pipe($.debug({title: 'pug:'}))
-    .pipe($.pug({pretty: pkg.opt.pug.pretty}))
-    .pipe(gulp.dest(pkg.paths.dist.base))
-    .pipe($.filter("**/*.html"))
-    .pipe($.livereload());
+    // state that we are building html
+    $.fancyLog($.chalk.yellow("-> Building html"));
+    // get pug files from src folder
+    return gulp.src(pkg.paths.src.pug + "**/*.pug")
+        // convert pug to html files
+        .pipe($.pug({pretty: pkg.opt.pug.pretty}))
+        // put generated html files into dist folder
+        .pipe(gulp.dest(pkg.paths.dist.base))
+        // if any html files change then... ?-necessary?
+        //.pipe($.filter("**/*.html"))
+        // livereload
+        .pipe($.livereload());
 });
+
 
 // inline js task - minimize the inline Javascript into _inlinejs in the templates path
 gulp.task("js-inline", () => {
     $.fancyLog($.chalk.yellow("-> Copying inline js"));
     return gulp.src(pkg.globs.inlineJs)
-        .pipe($.debug({title: 'jsinline:'}))
+        .pipe($.debug({title: '! jsinline:'}))
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.if(["*.js", "!*.min.js"],
             $.newer({dest: pkg.paths.templates + "_inlinejs", ext: ".min.js"}),
@@ -98,11 +123,12 @@ gulp.task("js-inline", () => {
         .pipe($.livereload());
 });
 
+
 // js task - minimize any distribution Javascript into the dist js folder, and add our banner to it
 gulp.task("js", ["js-inline"], () => {
     $.fancyLog($.chalk.yellow("-> Building js"));
-    return gulp.src(pkg.globs.distJs)
-        .pipe($.debug({title: 'js:'}))
+    return gulp.src(pkg.globs.js)
+        .pipe($.debug({title: '! js:'}))
         .pipe($.plumber({errorHandler: onError}))
         .pipe($.if(["*.js", "!*.min.js"],
             $.newer({dest: pkg.paths.dist.js, ext: ".min.js"}),
@@ -117,6 +143,7 @@ gulp.task("js", ["js-inline"], () => {
         .pipe($.filter("**/*.js"))
         .pipe($.livereload());
 });
+
 
 // Process data in an array synchronously, moving onto the n+1 item only after the nth item callback
 function doSynchronousLoop(data, processData, done) {
@@ -136,6 +163,7 @@ function doSynchronousLoop(data, processData, done) {
     }
 }
 
+
 // Process the downloads one at a time
 function processDownload(element, i, callback) {
     const downloadSrc = element.url;
@@ -147,6 +175,7 @@ function processDownload(element, i, callback) {
     callback();
 }
 
+
 // download task
 gulp.task("download", (callback) => {
     doSynchronousLoop(pkg.globs.download, processDownload, () => {
@@ -154,6 +183,7 @@ gulp.task("download", (callback) => {
         callback();
     });
 });
+
 
 // Run pa11y accessibility tests on each template
 function processAccessibility(element, i, callback) {
@@ -176,6 +206,7 @@ function processAccessibility(element, i, callback) {
     });
 }
 
+
 // accessibility task
 gulp.task("a11y", (callback) => {
     doSynchronousLoop(pkg.globs.critical, processAccessibility, () => {
@@ -183,6 +214,7 @@ gulp.task("a11y", (callback) => {
         callback();
     });
 });
+
 
 // imagemin task
 gulp.task("imagemin", () => {
@@ -201,6 +233,7 @@ gulp.task("imagemin", () => {
         .pipe(gulp.dest(pkg.paths.dist.img));
 });
 
+
 // Default task
 gulp.task("default", ["css", "js", "pug"], () => {
     $.livereload.listen();
@@ -214,6 +247,7 @@ gulp.task("default", ["css", "js", "pug"], () => {
             .pipe($.livereload());
     });
 });
+
 
 // Production build
 gulp.task("build", ["download", "default", "imagemin"]);
