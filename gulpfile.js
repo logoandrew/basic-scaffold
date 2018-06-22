@@ -93,6 +93,10 @@ gulp.task("pug", () => {
     $.fancyLog($.chalk.yellow("-> Building html"));
     // get pug files from src folder
     return gulp.src(pkg.paths.src.pug + "**/*.pug")
+        // give pug access to development data
+        .pipe($.data(function(file) {
+                return require('./package.json');
+            }))
         // convert pug to html files
         .pipe($.pug({pretty: pkg.opt.pug.pretty}))
         // put generated html files into dist folder
