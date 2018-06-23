@@ -81,10 +81,13 @@
       "./temp/css/*.css"
     ],
     "js": [
-      "./node_modules/lazysizes/lazysizes.min.js",
-      "./node_modules/lazysizes/plugins/bgset/ls.bgset.min.js",
-      "./node_modules/picturefill/dist/picturefill.min.js",
-      "./src/js/*.js"
+      "./node_modules/loadjs/dist/loadjs.js",
+      "./node_modules/tiny-cookie/dist/tiny-cookie.js",
+      "./node_modules/lazysizes/lazysizes.js",
+      "./node_modules/lazysizes/plugins/bgset/ls.bgset.js",
+      "./node_modules/picturefill/dist/picturefill.js",
+      "./src/js/*.js",
+      "./temp/js/*.js"
     ],
     "inlineJs": [
       "./node_modules/loadjs/dist/loadjs.min.js",

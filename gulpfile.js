@@ -37,16 +37,9 @@ gulp.task("sass", () => {
         // handle errors
         .pipe($.plumber({ errorHandler: onError }))
         // convert sass to css
-        .pipe($.sass({
-                includePaths: pkg.paths.src.sass,
-                outputStyle: pkg.opt.sass.output
-            })
-            .on("error", $.sass.logError))
+        .pipe($.sass({ includePaths: pkg.paths.src.sass, outputStyle: pkg.opt.sass.output }).on("error", $.sass.logError))
         // display file/size
-        .pipe($.size({
-                gzip: pkg.opt.size.gzipped,
-                showFiles: pkg.opt.size.showfiles
-            }))
+        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
         // put generated css file in temp folder
         .pipe(gulp.dest(pkg.paths.temp.css));
 });
@@ -77,10 +70,7 @@ gulp.task("css", ["sass"], () => {
         // add banner
         .pipe($.header(banner, { pkg: pkg }))
         // display file/size
-        .pipe($.size({
-                gzip: pkg.opt.size.gzipped,
-                showFiles: pkg.opt.size.showfiles
-            }))
+        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
         // put updated css file in dist folder
         .pipe(gulp.dest(pkg.paths.dist.css))
         // reload browsers
@@ -94,59 +84,40 @@ gulp.task("pug", () => {
     $.fancyLog($.chalk.yellow("-> Building html"));
     // get pug files from src folder
     return gulp.src(pkg.paths.src.pug + "**/*.pug")
+        // handle errors
+        .pipe($.plumber({ errorHandler: onError }))
         // give pug access to development data
-        .pipe($.data(function(file) {
-                return require('./package.json');
-            }))
+        .pipe($.data(function(file) { return require('./package.json'); }))
         // convert pug to html files
         .pipe($.pug({ pretty: pkg.opt.pug.pretty }))
+        // display file/size
+        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
         // put generated html files into dist folder
         .pipe(gulp.dest(pkg.paths.dist.base))
-        // if any html files change then... ?-necessary?
-        .pipe($.filter("**/*.html"))
         // reload browsers
         .pipe(browserSync.stream());
 });
 
 
-// inline js task - minimize the inline Javascript into _inlinejs in the templates path
-gulp.task("js-inline", () => {
-    $.fancyLog($.chalk.yellow("-> Copying inline js"));
-    return gulp.src(pkg.globs.inlineJs)
-        .pipe($.debug({ title: '! jsinline:' }))
-        .pipe($.plumber({ errorHandler: onError }))
-        .pipe($.if(["*.js", "!*.min.js"],
-            $.newer({ dest: pkg.paths.templates + "_inlinejs", ext: ".min.js" }),
-            $.newer({ dest: pkg.paths.templates + "_inlinejs" })
-        ))
-        .pipe($.if(["*.js", "!*.min.js"],
-            $.rename({ suffix: ".min" })
-        ))
-        .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
-        .pipe(gulp.dest(pkg.paths.templates + "_inlinejs"))
-        .pipe($.filter("**/*.js"))
-        // reload browsers
-        .pipe(browserSync.stream());
-});
+// create inline-js task ???
 
 
-// js task - minimize any distribution Javascript into the dist js folder, and add our banner to it
-gulp.task("js", ["js-inline"], () => {
+// SRC/VENDOR JS -> DIST JS
+gulp.task("js", () => {
+    // state that we are building js
     $.fancyLog($.chalk.yellow("-> Building js"));
+    // get js files from globs and/including temp folder
     return gulp.src(pkg.globs.js)
-        .pipe($.debug({ title: '! js:' }))
+        // handle errors
         .pipe($.plumber({ errorHandler: onError }))
-        .pipe($.if(["*.js", "!*.min.js"],
-            $.newer({ dest: pkg.paths.dist.js, ext: ".min.js" }),
-            $.newer({ dest: pkg.paths.dist.js })
-        ))
-        .pipe($.if(["*.js", "!*.min.js"],
-            $.rename({ suffix: ".min" })
-        ))
+        // combine js files
+        .pipe($.concat(pkg.vars.name.siteJs))
+        // add banner
         .pipe($.header(banner, { pkg: pkg }))
+        // display file/size
         .pipe($.size({ gzip: pkg.opt.size.gzipped, showFiles: pkg.opt.size.showfiles }))
+        // put generated js into dist folder
         .pipe(gulp.dest(pkg.paths.dist.js))
-        .pipe($.filter("**/*.js"))
         // reload browsers
         .pipe(browserSync.stream());
 });
@@ -192,51 +163,32 @@ gulp.task("download", (callback) => {
 });
 
 
-// Run pa11y accessibility tests on each template
-function processAccessibility(element, i, callback) {
-    const accessibilitySrc = pkg.urls.critical + element.url;
-    const cliReporter = require('./node_modules/pa11y/reporter/cli.js');
-    const options = {
-        log: cliReporter,
-        ignore:
-                [
-                    'notice',
-                    'warning'
-                ],
-        };
-    const test = $.pa11y(options);
-
-    $.fancyLog($.chalk.yellow("-> Checking Accessibility for URL: ") + $.chalk.cyan(accessibilitySrc));
-    test.run(accessibilitySrc, (error, results) => {
-        cliReporter.results(results, accessibilitySrc);
-        callback();
-    });
-}
+// create pa11y accessability task ??
 
 
-// accessibility task
-gulp.task("a11y", (callback) => {
-    doSynchronousLoop(pkg.globs.critical, processAccessibility, () => {
-        // all done
-        callback();
-    });
-});
-
-
-// imagemin task
+// PROCESS IMAGES
 gulp.task("imagemin", () => {
+    // state that we are processing images
+    $.fancyLog($.chalk.yellow("-> Processing images"));
+    // get image files from src
     return gulp.src(pkg.paths.src.img + "**/*.{png,jpg,jpeg,gif,svg}")
+        // process images
         .pipe($.imagemin([
+            // process gifs
           	$.imagemin.gifsicle({ interlaced: pkg.opt.imagemin.interlaced }),
+            // process jpegs
           	$.imagemin.jpegtran({ progressive: pkg.opt.imagemin.progressive }),
+            // process pngs
           	$.imagemin.optipng({ optimizationLevel: pkg.opt.imagemin.optimizationLevel }),
+            // process svgs
           	$.imagemin.svgo({
-          		plugins: [
-          			{ removeViewBox: pkg.opt.imagemin.svgoPlugins_removeVB },
-          			{ cleanupIDs: pkg.opt.imagemin.svgoPlugins_cleanupIDs }
-          		]
-          	})
+                		plugins: [
+                  			{ removeViewBox: pkg.opt.imagemin.svgoPlugins_removeVB },
+                  			{ cleanupIDs: pkg.opt.imagemin.svgoPlugins_cleanupIDs }
+                		]
+              	})
           ]))
+        // put processed images into dist folder
         .pipe(gulp.dest(pkg.paths.dist.img));
 });
 
