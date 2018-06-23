@@ -1,3 +1,6 @@
+// packages to add ??
+// gulp-cached, gulp-debug, gulp-filter, gulp-newer, gulp-rename, gulp-sourcemaps, pa11y
+
 // package vars
 const pkg = require("./package.json");
 
@@ -163,7 +166,7 @@ gulp.task("download", (callback) => {
 });
 
 
-// create pa11y accessability task ??
+// create pa11y accessibility task ??
 
 
 // PROCESS IMAGES
@@ -174,13 +177,13 @@ gulp.task("imagemin", () => {
     return gulp.src(pkg.paths.src.img + "**/*.{png,jpg,jpeg,gif,svg}")
         // process images
         .pipe($.imagemin([
-            // process gifs
+            // process GIFs
           	$.imagemin.gifsicle({ interlaced: pkg.opt.imagemin.interlaced }),
-            // process jpegs
+            // process JPEGs
           	$.imagemin.jpegtran({ progressive: pkg.opt.imagemin.progressive }),
-            // process pngs
+            // process PNGs
           	$.imagemin.optipng({ optimizationLevel: pkg.opt.imagemin.optimizationLevel }),
-            // process svgs
+            // process SVGs
           	$.imagemin.svgo({
                 		plugins: [
                   			{ removeViewBox: pkg.opt.imagemin.svgoPlugins_removeVB },
@@ -194,7 +197,7 @@ gulp.task("imagemin", () => {
 
 
 // Default task
-gulp.task("default", ["css", "js", "pug"], () => {
+gulp.task("default", ["download", "css", "js", "pug", "imagemin"], () => {
     browserSync.init({
         server: "./dist"
     });
@@ -202,10 +205,11 @@ gulp.task("default", ["css", "js", "pug"], () => {
     gulp.watch([pkg.paths.src.css + "**/*.css"], ["css"]);
     gulp.watch([pkg.paths.src.js + "**/*.js"], ["js"]);
     gulp.watch([pkg.paths.src.pug + "**/*.pug"], ["pug"]);
+    gulp.watch([pkg.paths.src.img + "**/*.{png,jpg,jpeg,gif,svg}"], ["imagemin"]);
     gulp.watch([pkg.paths.dist.base + "**/*.{html,htm}"])
         .on('change', browserSync.reload);
 });
 
 
 // Production build
-gulp.task("build", ["download", "default", "imagemin"]);
+//gulp.task("build", ["download", "default", "imagemin"]);
