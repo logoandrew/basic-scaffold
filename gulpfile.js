@@ -102,6 +102,22 @@ gulp.task("pug", () => {
 });
 
 
+// INLINE CRITICAL CSS
+gulp.task("critCSS", ["css"], () => {
+    $.fancyLog($.chalk.yellow("-> Inlining critical css"));
+    $.critical.generate({
+        inline: true,
+        base: pkg.paths.dist.base,
+        src: 'index.html',
+        dest: 'index.html',
+        minify: true,
+        width: 1200,
+        height: 900
+    });
+    browserSync.stream();
+});
+
+
 // create inline-js task ???
 
 
@@ -197,7 +213,7 @@ gulp.task("imagemin", () => {
 
 
 // Default task
-gulp.task("default", ["download", "css", "js", "pug", "imagemin"], () => {
+gulp.task("default", ["download", "pug", "css", "js", "imagemin"], () => {
     browserSync.init({
         server: "./dist"
     });
@@ -212,4 +228,15 @@ gulp.task("default", ["download", "css", "js", "pug", "imagemin"], () => {
 
 
 // Production build
-//gulp.task("build", ["download", "default", "imagemin"]);
+gulp.task("build", ["download", "pug", "critCSS", "js", "imagemin"], () => {
+    browserSync.init({
+        server: "./dist"
+    });
+    gulp.watch([pkg.paths.src.sass + "**/*.sass"], ["critCSS"]);
+    gulp.watch([pkg.paths.src.css + "**/*.css"], ["critCSS"]);
+    gulp.watch([pkg.paths.src.js + "**/*.js"], ["js"]);
+    gulp.watch([pkg.paths.src.pug + "**/*.pug"], ["pug", "critCSS"]);
+    gulp.watch([pkg.paths.src.img + "**/*.{png,jpg,jpeg,gif,svg}"], ["imagemin"]);
+    gulp.watch([pkg.paths.dist.base + "**/*.{html,htm}"])
+        .on('change', browserSync.reload);
+});
