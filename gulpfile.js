@@ -1,5 +1,9 @@
-// packages to add ??
-// gulp-cached, gulp-debug, gulp-filter, gulp-newer, gulp-rename, gulp-sourcemaps, pa11y
+// packages to look into ??
+// gulp-cached, gulp-debug, gulp-filter, gulp-newer, gulp-rename, gulp-sourcemaps, pa11y,
+// babel-plugin-transform-runtime, babel-preset-es2015, gulp-babel, gulp-favicons, gulp-fontello,
+// gulp-replace, gulp-rev, gulp-streamify, gulp-uglify, vinyl-source-stream, vueify, fg-loadcss,
+// fontfaceobserver, prismjs
+
 
 // package vars
 const pkg = require("./package.json");
@@ -24,9 +28,10 @@ const banner = [
     " * @project        <%= pkg.name %>",
     " * @author         <%= pkg.author %>",
     " * @build          " + $.moment().format("llll") + " ET",
+    " * @release        <%= pkg.version %>, " + $.gitRevSync.long() + " [" + $.gitRevSync.branch() + "]",
     " * @copyright      Copyright (c) " + $.moment().format("YYYY") + ", <%= pkg.copyright %>",
-    " *",
     " */",
+    "",
     ""
 ].join("\n");
 
@@ -213,7 +218,7 @@ gulp.task("imagemin", () => {
 
 
 // Default task
-gulp.task("default", ["download", "pug", "css", "js", "imagemin"], () => {
+gulp.task("default", ["pug", "js", "css", "imagemin"], () => {
     browserSync.init({
         server: "./dist"
     });
@@ -228,7 +233,7 @@ gulp.task("default", ["download", "pug", "css", "js", "imagemin"], () => {
 
 
 // Production build
-gulp.task("build", ["download", "pug", "critCSS", "js", "imagemin"], () => {
+gulp.task("build", ["pug", "download", "js", "critCSS", "imagemin"], () => {
     browserSync.init({
         server: "./dist"
     });
